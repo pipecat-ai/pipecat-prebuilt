@@ -18,7 +18,7 @@ import {
 } from "@pipecat-ai/websocket-transport";
 import { PipecatClient, RTVIEvent } from "@pipecat-ai/client-js";
 
-type TransportType = "smallwebrtc" | "daily" | "websocket" | "twilio";
+type TransportType = "smallwebrtc" | "daily" | "websocket" | "twilio" | "moq";
 
 const TRANSPORT_OPTIONS: { value: TransportType; label: string }[] = [
   { value: "smallwebrtc", label: "SmallWebRTC" },
@@ -26,12 +26,28 @@ const TRANSPORT_OPTIONS: { value: TransportType; label: string }[] = [
   { value: "websocket", label: "WebSocket" },
   // Twilio is also a websocket transport, just with a special serializer
   { value: "twilio", label: "Twilio" },
+  { value: "moq", label: "Media over QUIC" },
 ];
 
 type TransportProps = Pick<
   React.ComponentProps<typeof ConsoleTemplate>,
   "startBotParams" | "transportOptions" | "startBotResponseTransformer"
 >;
+
+type MoqStartResponse = {
+  sessionId?: string;
+  moq?: {
+    relayUrl: string;
+    certHash: string | null;
+    namespace: string;
+    clientId: string;
+    botId: string;
+    publishTrack: string;
+    subscribeTrack: string;
+    transcriptTrack: string;
+    messageTrack: string;
+  };
+};
 
 const websocketResponseTransformer = (response: unknown) => {
   const { wsUrl, token } = response as { wsUrl: string; token?: string };
@@ -40,9 +56,37 @@ const websocketResponseTransformer = (response: unknown) => {
   };
 };
 
-function getTransportProps(
-  type: TransportType,
-): TransportProps {
+/** Decode the base64 SHA-256 cert hash into the ArrayBuffer shape that
+ *  WebTransport.serverCertificateHashes expects. */
+function decodeCertHash(b64: string): ArrayBuffer {
+  const bin = atob(b64);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return bytes.buffer;
+}
+
+const moqResponseTransformer = (response: unknown) => {
+  const start = response as MoqStartResponse;
+  if (!start.moq) {
+    throw new Error("/start did not return MoQ config (server may not be -t moq)");
+  }
+  const moq = start.moq;
+  return {
+    relayUrl: moq.relayUrl,
+    clientId: moq.clientId,
+    botId: moq.botId,
+    namespace: moq.namespace,
+    publishTrack: moq.publishTrack,
+    subscribeTrack: moq.subscribeTrack,
+    transcriptTrack: moq.transcriptTrack,
+    messageTrack: moq.messageTrack,
+    serverCertificateHashes: moq.certHash
+      ? [{ algorithm: "sha-256", value: decodeCertHash(moq.certHash) }]
+      : undefined,
+  };
+};
+
+function getTransportProps(type: TransportType): TransportProps {
   switch (type) {
     case "smallwebrtc":
       return {
@@ -92,6 +136,16 @@ function getTransportProps(
           playerSampleRate: 8000,
         },
         startBotResponseTransformer: websocketResponseTransformer,
+      };
+    case "moq":
+      return {
+        startBotParams: {
+          endpoint: `/start`,
+          requestData: {
+            transport: "moq",
+          },
+        },
+        startBotResponseTransformer: moqResponseTransformer,
       };
   }
 }
@@ -166,7 +220,13 @@ function Home() {
         <ConsoleTemplate
           key={transportType}
           transportType={
-            transportType === "twilio" ? "websocket" : transportType
+            transportType === "twilio"
+              ? "websocket"
+              : (transportType as
+                  | "smallwebrtc"
+                  | "daily"
+                  | "websocket"
+                  | "moq")
           }
           startBotParams={startBotParams}
           transportOptions={transportOptions}
