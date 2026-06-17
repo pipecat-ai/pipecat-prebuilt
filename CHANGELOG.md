@@ -17,6 +17,23 @@ Users should install:
 pip install pipecat-ai-prebuilt
 ```
 
+## [Unreleased]
+
+### Added
+
+- MoQ (Media over QUIC) transport support in the prebuilt client. Adds a
+  "Media over QUIC" option to the transport selector and a response
+  transformer that maps the server's `/start` payload (relay URL, namespace,
+  track names, and optional SHA-256 cert hash) into the shape the MoQ
+  transport expects.
+
+### Fixed
+
+- Deduped `react`, `react-dom`, `react/jsx-runtime`, `@pipecat-ai/client-js`,
+  and `@pipecat-ai/client-react` in `vite.config.js` to prevent the linked
+  `voice-ui-kit` from loading a second React instance (which surfaced as
+  "Invalid hook call" at runtime).
+
 ## [1.0.2] - 2026-06-03
 
 ### Changed
