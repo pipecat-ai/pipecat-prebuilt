@@ -6,6 +6,7 @@ dist
 client/node_modules
 client/dist
 test/.env
+test/uv.lock
 
 # Python
 __pycache__/
