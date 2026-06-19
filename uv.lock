@@ -544,7 +544,7 @@ wheels = [
 
 [[package]]
 name = "pipecat-ai-prebuilt"
-version = "1.0.2"
+version = "1.0.3"
 source = { editable = "." }
 dependencies = [
     { name = "fastapi", extra = ["all"] },
