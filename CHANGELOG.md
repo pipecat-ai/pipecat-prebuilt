@@ -17,6 +17,14 @@ Users should install:
 pip install pipecat-ai-prebuilt
 ```
 
+## [1.0.3] - 2026-06-19
+
+### Changed
+
+- Updating Pipecat client dependencies to the latest version (1.12.0), along
+  with all transports.
+- Updated dependencies to fix security vulnerabilities.
+
 ## [1.0.2] - 2026-06-03
 
 ### Changed
