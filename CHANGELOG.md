@@ -17,6 +17,17 @@ Users should install:
 pip install pipecat-ai-prebuilt
 ```
 
+## [1.0.4] - 2026-07-16
+
+### Added
+
+- Added DTMF keypad support, provided by `voice-ui-kit` 0.12.0.
+
+### Changed
+
+- Updating Pipecat client dependencies to the latest version (1.13.0), along
+  with all transports.
+
 ## [1.0.3] - 2026-06-19
 
 ### Changed
