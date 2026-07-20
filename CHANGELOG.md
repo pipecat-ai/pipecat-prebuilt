@@ -17,6 +17,15 @@ Users should install:
 pip install pipecat-ai-prebuilt
 ```
 
+## [Unreleased]
+
+### Added
+
+- MoQ (Media over QUIC) transport support in the prebuilt client. Adds a
+  "Media over QUIC" option to the transport selector and a response
+  transformer that maps the server's `/start` payload (relay URL, namespace,
+  and track names) into the shape the MoQ transport expects.
+
 ## [1.0.4] - 2026-07-16
 
 ### Added

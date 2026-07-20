@@ -18,7 +18,7 @@ import {
 } from "@pipecat-ai/websocket-transport";
 import { PipecatClient, RTVIEvent } from "@pipecat-ai/client-js";
 
-type TransportType = "smallwebrtc" | "daily" | "websocket" | "twilio";
+type TransportType = "smallwebrtc" | "daily" | "websocket" | "twilio" | "moq";
 
 const TRANSPORT_OPTIONS: { value: TransportType; label: string }[] = [
   { value: "smallwebrtc", label: "SmallWebRTC" },
@@ -26,6 +26,7 @@ const TRANSPORT_OPTIONS: { value: TransportType; label: string }[] = [
   { value: "websocket", label: "WebSocket" },
   // Twilio is also a websocket transport, just with a special serializer
   { value: "twilio", label: "Twilio" },
+  { value: "moq", label: "Media over QUIC" },
 ];
 
 type TransportProps = Pick<
@@ -92,6 +93,15 @@ function getTransportProps(
           playerSampleRate: 8000,
         },
         startBotResponseTransformer: websocketResponseTransformer,
+      };
+    case "moq":
+      return {
+        startBotParams: {
+          endpoint: `/start`,
+          requestData: {
+            transport: "moq",
+          },
+        },
       };
   }
 }
@@ -166,7 +176,13 @@ function Home() {
         <ConsoleTemplate
           key={transportType}
           transportType={
-            transportType === "twilio" ? "websocket" : transportType
+            transportType === "twilio"
+              ? "websocket"
+              : (transportType as
+                  | "smallwebrtc"
+                  | "daily"
+                  | "websocket"
+                  | "moq")
           }
           startBotParams={startBotParams}
           transportOptions={transportOptions}
