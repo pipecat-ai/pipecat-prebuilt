@@ -17,7 +17,7 @@ Users should install:
 pip install pipecat-ai-prebuilt
 ```
 
-## [Unreleased]
+## [1.0.5] - 2026-07-20
 
 ### Added
 
