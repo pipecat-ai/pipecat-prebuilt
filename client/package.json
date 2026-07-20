@@ -1,6 +1,6 @@
 {
   "name": "client",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "main": "index.js",
   "scripts": {
     "dev": "node_modules/.bin/vite",
@@ -30,7 +30,8 @@
     "@pipecat-ai/small-webrtc-transport": "^1.10.6",
     "@pipecat-ai/daily-transport": "^1.6.8",
     "@pipecat-ai/websocket-transport": "^1.7.1",
-    "@pipecat-ai/voice-ui-kit": "^0.12.0",
+    "@pipecat-ai/moq-transport": "^0.1.0",
+    "@pipecat-ai/voice-ui-kit": "^0.13.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   }
