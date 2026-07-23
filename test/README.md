@@ -29,13 +29,13 @@ This is a simple example app to help you test your Pipecat bot with a prebuilt U
 2. **Install dependencies:**
 
    ```bash
-   uv sync
+   uv sync --locked
    ```
 
    This will:
 
    - Create a virtual environment automatically
-   - Install all dependencies from `pyproject.toml`
+   - Install the exact dependency versions recorded in `uv.lock`
    - Install the local `pipecat-ai-prebuilt` package in editable mode
 
 3. **Set up environment variables:**
