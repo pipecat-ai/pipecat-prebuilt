@@ -1,0 +1,13 @@
+version: 2
+
+updates:
+  - package-ecosystem: "pip"
+    directory: "/test"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 0
+    groups:
+      test-python-security:
+        applies-to: "security-updates"
+        patterns:
+          - "*"
