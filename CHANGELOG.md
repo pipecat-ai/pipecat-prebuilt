@@ -17,6 +17,18 @@ Users should install:
 pip install pipecat-ai-prebuilt
 ```
 
+## [Unreleased]
+
+### Added
+
+- MoQ direct-mode support. A bot run with `--moq-direct` is already on the
+  relay before anyone opens the client, so there is no `/start` to ask where
+  to meet it. The client reads the session from the page URL instead —
+  `relay`, `ns`, `botId`, and `clientId`, as the Pipecat runner prints them —
+  and connects the transport straight from those, skipping the `/start` POST.
+  A URL carrying `relay` also opens on the MoQ transport rather than the
+  default. Without it, MoQ behaves exactly as before.
+
 ## [1.0.5] - 2026-07-20
 
 ### Added

@@ -16,9 +16,39 @@ import {
   TwilioSerializer,
   WebSocketTransport,
 } from "@pipecat-ai/websocket-transport";
+import type { MoqTransportOptions } from "@pipecat-ai/moq-transport";
 import { PipecatClient, RTVIEvent } from "@pipecat-ai/client-js";
 
 type TransportType = "smallwebrtc" | "daily" | "websocket" | "twilio" | "moq";
+
+/**
+ * Read a MoQ direct-mode session from the page URL.
+ *
+ * A bot run with `--moq-direct` is already on the relay before anyone opens
+ * this page, so there is no `/start` to ask where to meet it. The runner
+ * prints a URL carrying that instead: the relay to dial, the namespace to
+ * rendezvous on, and which end of the path pair each side owns.
+ *
+ * Returns null for a normal `/start` session.
+ */
+function readMoqDirectOptions(): MoqTransportOptions | null {
+  const params = new URLSearchParams(window.location.search);
+  const relayUrl = params.get("relay");
+  if (!relayUrl) return null;
+
+  const namespace = params.get("ns");
+  const botId = params.get("botId");
+  const clientId = params.get("clientId");
+  return {
+    relayUrl,
+    ...(namespace ? { namespace } : {}),
+    // The bot publishes its own broadcast as the response and reads the
+    // peer's as the request, so we take the opposite pair. Worth passing
+    // explicitly: the transport still defaults to the older bot0/client0.
+    ...(botId ? { botId } : {}),
+    ...(clientId ? { clientId } : {}),
+  };
+}
 
 const TRANSPORT_OPTIONS: { value: TransportType; label: string }[] = [
   { value: "smallwebrtc", label: "SmallWebRTC" },
@@ -94,7 +124,13 @@ function getTransportProps(
         },
         startBotResponseTransformer: websocketResponseTransformer,
       };
-    case "moq":
+    case "moq": {
+      const directOptions = readMoqDirectOptions();
+      if (directOptions) {
+        // Leaving startBotParams unset is what skips the /start POST: the
+        // base connects the transport straight from these options.
+        return { transportOptions: directOptions };
+      }
       return {
         startBotParams: {
           endpoint: `/start`,
@@ -103,6 +139,7 @@ function getTransportProps(
           },
         },
       };
+    }
   }
 }
 
@@ -138,8 +175,11 @@ function TransportSelect({ value, onValueChange }: TransportSelectProps) {
 }
 
 function Home() {
-  const [transportType, setTransportType] =
-    useState<TransportType>("smallwebrtc");
+  // A direct-mode URL names the session to join, so open on that transport
+  // instead of making the visitor pick it out of the selector.
+  const [transportType, setTransportType] = useState<TransportType>(() =>
+    readMoqDirectOptions() ? "moq" : "smallwebrtc",
+  );
   const { startBotParams, transportOptions, startBotResponseTransformer } =
     getTransportProps(transportType);
 
