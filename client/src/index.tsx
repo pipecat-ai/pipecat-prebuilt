@@ -37,16 +37,22 @@ function readMoqDirectOptions(): MoqTransportOptions | null {
   if (!relayUrl) return null;
 
   const namespace = params.get("ns");
-  const botId = params.get("botId");
-  const clientId = params.get("clientId");
+  // The bot publishes its own broadcast as the response and reads the
+  // peer's as the request, so we take the opposite pair. Worth naming
+  // explicitly: the transport still defaults to the older bot0/client0.
+  const botId = params.get("botId") ?? "response";
+  const clientId = params.get("clientId") ?? "request";
+
+  // Everyone on this URL shares a namespace, so the session id is what
+  // keeps one caller's broadcasts off another's. The runner watches the
+  // request prefix and starts a bot per id it sees, which is why we mint
+  // it here rather than being told one.
+  const session = crypto.randomUUID();
   return {
     relayUrl,
     ...(namespace ? { namespace } : {}),
-    // The bot publishes its own broadcast as the response and reads the
-    // peer's as the request, so we take the opposite pair. Worth passing
-    // explicitly: the transport still defaults to the older bot0/client0.
-    ...(botId ? { botId } : {}),
-    ...(clientId ? { clientId } : {}),
+    botId: `${botId}/${session}`,
+    clientId: `${clientId}/${session}`,
   };
 }
 

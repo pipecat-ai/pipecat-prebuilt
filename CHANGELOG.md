@@ -21,13 +21,17 @@ pip install pipecat-ai-prebuilt
 
 ### Added
 
-- MoQ direct-mode support. A bot run with `--moq-direct` is already on the
-  relay before anyone opens the client, so there is no `/start` to ask where
-  to meet it. The client reads the session from the page URL instead —
-  `relay`, `ns`, `botId`, and `clientId`, as the Pipecat runner prints them —
-  and connects the transport straight from those, skipping the `/start` POST.
-  A URL carrying `relay` also opens on the MoQ transport rather than the
-  default. Without it, MoQ behaves exactly as before.
+- MoQ direct-mode support. A bot run with `--moq-direct` waits on the relay
+  rather than being started by a `/start` request, so there is nothing to ask
+  where to meet it. The client reads the relay and namespace from the page URL
+  instead — `relay`, `ns`, `botId`, and `clientId`, as the Pipecat runner
+  prints them — and connects the transport straight from those, skipping the
+  `/start` POST. A URL carrying `relay` also opens on the MoQ transport rather
+  than the default.
+- Each page load mints its own session id and hangs both broadcast paths off
+  it, so a shared direct-mode URL gives every visitor their own call instead of
+  publishing over each other. The runner starts a bot per id it sees.
+- Without `relay` in the URL, MoQ behaves exactly as before.
 
 ## [1.0.5] - 2026-07-20
 
