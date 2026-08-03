@@ -36,7 +36,12 @@ function readMoqDirectOptions(): MoqTransportOptions | null {
   const relayUrl = params.get("relay");
   if (!relayUrl) return null;
 
-  const namespace = params.get("ns");
+  // Empty rather than the transport's built-in default, so an unscoped
+  // URL puts the call at the relay root instead of silently joining the
+  // shared `pipecat` namespace. The session id below is what keeps one
+  // caller's broadcasts off another's.
+  const namespace = params.get("ns") ?? "";
+
   // The bot publishes its own broadcast as the response and reads the
   // peer's as the request, so we take the opposite pair. Worth naming
   // explicitly: the transport still defaults to the older bot0/client0.
@@ -50,7 +55,7 @@ function readMoqDirectOptions(): MoqTransportOptions | null {
   const session = crypto.randomUUID();
   return {
     relayUrl,
-    ...(namespace ? { namespace } : {}),
+    namespace,
     botId: `${botId}/${session}`,
     clientId: `${clientId}/${session}`,
   };
