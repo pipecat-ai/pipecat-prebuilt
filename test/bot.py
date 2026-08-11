@@ -38,8 +38,12 @@ from pipecat.processors.aggregators.llm_response_universal import (
 )
 from pipecat.runner.types import RunnerArguments
 from pipecat.runner.utils import create_transport
+from pipecat.services.anthropic.llm import AnthropicLLMService
+from pipecat.services.cartesia.tts import CartesiaTTSService
+from pipecat.services.deepgram.stt import DeepgramSTTService
 from pipecat.services.google.gemini_live.llm import GeminiLiveLLMService
 from pipecat.transports.base_transport import BaseTransport, TransportParams
+from pipecat.transports.livekit.transport import LiveKitParams
 from pipecat.workers.runner import WorkerRunner
 
 load_dotenv(override=True)
@@ -57,6 +61,10 @@ transport_params = {
         audio_out_enabled=True,
     ),
     "webrtc": lambda: TransportParams(
+        audio_in_enabled=True,
+        audio_out_enabled=True,
+    ),
+    "livekit": lambda: LiveKitParams(
         audio_in_enabled=True,
         audio_out_enabled=True,
     ),
@@ -80,11 +88,30 @@ Respond to what the user said in a creative and helpful way. Keep your responses
 
 
 async def run_bot(transport: BaseTransport, runner_args: RunnerArguments):
-    llm = GeminiLiveLLMService(
-        api_key=os.getenv("GOOGLE_API_KEY"),
-        settings=GeminiLiveLLMService.Settings(
-            voice="Aoede",  # Puck, Charon, Kore, Fenrir, Aoede
-            system_instruction=SYSTEM_INSTRUCTION,
+    # llm = GeminiLiveLLMService(
+    #     api_key=os.getenv("GOOGLE_API_KEY"),
+    #     settings=GeminiLiveLLMService.Settings(
+    #         voice="Aoede",  # Puck, Charon, Kore, Fenrir, Aoede
+    #         system_instruction=SYSTEM_INSTRUCTION,
+    #     ),
+    # )
+
+    # Speech-to-Text service
+    stt = DeepgramSTTService(api_key=os.getenv("DEEPGRAM_API_KEY"))
+
+    # Text-to-Speech service
+    tts = CartesiaTTSService(
+        api_key=os.getenv("CARTESIA_API_KEY"),
+        settings=CartesiaTTSService.Settings(
+            voice=os.getenv("CARTESIA_VOICE_ID", "71a7ad14-091c-4e8e-a314-022ece01c121"),
+        ),
+    )
+
+    # LLM service
+    llm = AnthropicLLMService(
+        api_key=os.getenv("ANTHROPIC_API_KEY"),
+        settings=AnthropicLLMService.Settings(
+            system_instruction="You are a helpful assistant in a voice conversation. Users can upload images or files to share visual context with you, and you should refer to that content in your responses. Your responses will be spoken aloud, so avoid emojis, bullet points, or other formatting that can't be spoken. Keep responses concise.",
         ),
     )
 
@@ -106,8 +133,10 @@ async def run_bot(transport: BaseTransport, runner_args: RunnerArguments):
     pipeline = Pipeline(
         [
             transport.input(),
+            stt,
             user_aggregator,
             llm,
+            tts,
             transport.output(),
             assistant_aggregator,
         ]

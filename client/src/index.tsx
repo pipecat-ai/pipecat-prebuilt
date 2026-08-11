@@ -18,7 +18,13 @@ import {
 } from "@pipecat-ai/websocket-transport";
 import { PipecatClient, RTVIEvent } from "@pipecat-ai/client-js";
 
-type TransportType = "smallwebrtc" | "daily" | "websocket" | "twilio" | "moq";
+type TransportType =
+  | "smallwebrtc"
+  | "daily"
+  | "websocket"
+  | "twilio"
+  | "livekit"
+  | "moq";
 
 const TRANSPORT_OPTIONS: { value: TransportType; label: string }[] = [
   { value: "smallwebrtc", label: "SmallWebRTC" },
@@ -26,6 +32,7 @@ const TRANSPORT_OPTIONS: { value: TransportType; label: string }[] = [
   { value: "websocket", label: "WebSocket" },
   // Twilio is also a websocket transport, just with a special serializer
   { value: "twilio", label: "Twilio" },
+  { value: "livekit", label: "LiveKit" },
   { value: "moq", label: "Media over QUIC" },
 ];
 
@@ -41,9 +48,7 @@ const websocketResponseTransformer = (response: unknown) => {
   };
 };
 
-function getTransportProps(
-  type: TransportType,
-): TransportProps {
+function getTransportProps(type: TransportType): TransportProps {
   switch (type) {
     case "smallwebrtc":
       return {
@@ -94,6 +99,15 @@ function getTransportProps(
         },
         startBotResponseTransformer: websocketResponseTransformer,
       };
+    case "livekit":
+      return {
+        startBotParams: {
+          endpoint: `/start`,
+          requestData: {
+            transport: "livekit",
+          },
+        },
+      };
     case "moq":
       return {
         startBotParams: {
@@ -138,13 +152,12 @@ function TransportSelect({ value, onValueChange }: TransportSelectProps) {
 }
 
 function Home() {
-  const [transportType, setTransportType] =
-    useState<TransportType>("smallwebrtc");
+  const [transportType, setTransportType] = useState<TransportType>("livekit");
   const { startBotParams, transportOptions, startBotResponseTransformer } =
     getTransportProps(transportType);
 
   const emulateTwilioMessages = async (
-    websocketTransport: WebSocketTransport,
+    websocketTransport: WebSocketTransport
   ) => {
     const connectedMessage = {
       event: "connected",
@@ -165,7 +178,7 @@ function Home() {
   const onClientConnected = async (pipecatClient: PipecatClient) => {
     if (transportType === "twilio") {
       await emulateTwilioMessages(
-        pipecatClient.transport as WebSocketTransport,
+        pipecatClient.transport as WebSocketTransport
       );
     }
   };
@@ -182,6 +195,7 @@ function Home() {
                   | "smallwebrtc"
                   | "daily"
                   | "websocket"
+                  | "livekit"
                   | "moq")
           }
           startBotParams={startBotParams}
@@ -198,6 +212,11 @@ function Home() {
             client.on(RTVIEvent.Connected, async () => {
               await onClientConnected(client);
             });
+            client.on(RTVIEvent.MicUpdated, (mic) => {
+              // @ts-ignore
+              window.client = client;
+              console.log("Mic updated:", mic);
+            });
           }}
         />
       </FullScreenContainer>
@@ -208,5 +227,5 @@ function Home() {
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <Home />
-  </StrictMode>,
+  </StrictMode>
 );

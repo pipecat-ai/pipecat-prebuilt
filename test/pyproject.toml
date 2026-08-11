@@ -4,12 +4,13 @@ version = "0.1.0"
 description = "Quickstart example for building voice AI bots with Pipecat"
 requires-python = ">=3.11"
 dependencies = [
-    "pipecat-ai[google,daily,silero,webrtc,runner]>=1.0.0",
+    "pipecat-ai[anthropic,cartesia,google,daily,deepgram,livekit,silero,webrtc,runner]>=1.0.0",
     "pipecat-ai-prebuilt"
 ]
 
 [tool.uv.sources]
 pipecat-ai-prebuilt = { path = "../", editable = true }
+pipecat-ai = { path = "../../../../pipecat", editable=true }
 
 [dependency-groups]
 dev = [
