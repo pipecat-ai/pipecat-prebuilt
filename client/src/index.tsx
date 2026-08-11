@@ -152,8 +152,7 @@ function TransportSelect({ value, onValueChange }: TransportSelectProps) {
 }
 
 function Home() {
-  const [transportType, setTransportType] =
-    useState<TransportType>("smallwebrtc");
+  const [transportType, setTransportType] = useState<TransportType>("livekit");
   const { startBotParams, transportOptions, startBotResponseTransformer } =
     getTransportProps(transportType);
 

@@ -5,6 +5,9 @@ export default defineConfig({
   base: "./", //Use relative paths so it works at any mount path
   plugins: [react()],
   publicDir: "public",
+  resolve: {
+    dedupe: ["react", "react-dom"],
+  },
   server: {
     allowedHosts: true, // Allows external connections like ngrok
     proxy: {
