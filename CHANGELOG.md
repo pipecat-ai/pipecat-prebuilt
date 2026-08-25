@@ -17,6 +17,18 @@ Users should install:
 pip install pipecat-ai-prebuilt
 ```
 
+## [1.0.6] - 2026-08-25
+
+### Changed
+
+- Updated client dependencies to:
+  - `@pipecat-ai/client-react` to `1.8.2`
+  - `@pipecat-ai/moq-transport` to `0.1.1`
+  - `@pipecat-ai/voice-ui-kit` to `0.13.1`
+- Updated build tooling to resolve Dependabot alerts: `postcss` to `8.5.26` and
+  `setuptools` to `83.0.0`. No change to the published package's runtime
+  dependencies.
+
 ## [1.0.5] - 2026-07-20
 
 ### Added
