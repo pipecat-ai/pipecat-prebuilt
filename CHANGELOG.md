@@ -17,6 +17,21 @@ Users should install:
 pip install pipecat-ai-prebuilt
 ```
 
+## [1.1.0] - 2026-09-09
+
+### Added
+
+- LiveKit transport support in the prebuilt client. Adds a "LiveKit" option to
+  the transport selector, backed by `@pipecat-ai/livekit-transport` 1.0.0. The
+  client sends `transport: "livekit"` to the server's `/start` endpoint.
+- The test bot now accepts `livekit` as a transport, using `LiveKitParams`.
+
+### Changed
+
+- Updated `@pipecat-ai/voice-ui-kit` to `0.14.0`.
+- Deduplicated `react` and `react-dom` in the Vite config so only a single copy
+  of each is bundled.
+
 ## [1.0.6] - 2026-08-25
 
 ### Changed
