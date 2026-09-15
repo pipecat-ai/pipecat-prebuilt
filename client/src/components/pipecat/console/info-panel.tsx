@@ -1,5 +1,6 @@
 "use client";
 
+import { usePipecatClientCamControl } from "@pipecat-ai/client-react";
 import { ChevronsLeftRightEllipsisIcon, InfoIcon, MicIcon } from "lucide-react";
 import * as React from "react";
 
@@ -83,13 +84,18 @@ export function ConsoleInfoPanel({
   collapsed = false,
   className,
 }: ConsoleInfoPanelProps) {
+  // Most agents never use the camera, so its preview tile only takes space
+  // once the camera is on.
+  const { isCamEnabled } = usePipecatClientCamControl();
   const noDevices = noUserAudio && noUserVideo && noScreenControl;
   if (noStatusInfo && noDevices && noSessionInfo) return null;
 
   const devices = (
     <div className="flex flex-col gap-2">
       {!noUserAudio && <UserAudioControl className="w-full" />}
-      {!noUserVideo && <UserVideoControl className="w-full" />}
+      {!noUserVideo && (
+        <UserVideoControl className="w-full" noVideo={!isCamEnabled} />
+      )}
       {!noScreenControl && <UserScreenControl className="w-full" />}
     </div>
   );

@@ -95,7 +95,7 @@ export function ClientStatus({
     <dl
       data-slot="client-status"
       className={cn(
-        "grid grid-cols-[1fr_2fr] items-center gap-2 text-sm",
+        "grid grid-cols-[auto_minmax(0,1fr)] items-center gap-2 text-sm",
         className,
       )}
     >

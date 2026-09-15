@@ -122,7 +122,7 @@ export function SessionInfoView({
     <dl
       data-slot="session-info"
       className={cn(
-        "grid w-full grid-cols-[1fr_2fr] items-center gap-2 overflow-hidden text-sm",
+        "grid w-full grid-cols-[auto_minmax(0,1fr)] items-center gap-2 overflow-hidden text-sm",
         className,
       )}
     >
