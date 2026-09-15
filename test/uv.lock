@@ -1971,7 +1971,7 @@ websocket = [
 
 [[package]]
 name = "pipecat-ai-prebuilt"
-version = "1.0.6"
+version = "1.1.1"
 source = { editable = "../" }
 dependencies = [
     { name = "fastapi", extra = ["all"] },
