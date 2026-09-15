@@ -197,7 +197,7 @@ function TransportSelect({ value, onValueChange }: TransportSelectProps) {
       value={value}
       onValueChange={(next) => onValueChange(next as TransportType)}
     >
-      <SelectTrigger aria-label="Transport" size="sm" className="w-32 sm:w-40">
+      <SelectTrigger aria-label="Transport" size="sm" className="w-40 min-w-24">
         <SelectValue />
       </SelectTrigger>
       <SelectContent>

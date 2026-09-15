@@ -345,7 +345,8 @@ function ConsoleShell({
   onInjectMessage,
   className,
 }: ConsoleProps & { app: UsePipecatAppReturn }) {
-  const isDesktop = useMinWidth(640);
+  // Three resizable columns need about 1024px; narrower screens get tabs.
+  const isDesktop = useMinWidth(1024);
 
   // -- Session facts collected from RTVI events ------------------------------
   const [participantId, setParticipantId] = React.useState<string>();
@@ -518,26 +519,29 @@ function ConsoleShell({
     >
       <header
         data-slot="console-header"
-        className="grid grid-cols-[1fr_auto] items-center gap-2 border-b px-3 py-2 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]"
+        className="flex items-center gap-2 border-b px-3 py-2"
       >
-        <div className="flex items-center">
+        <div className="flex shrink-0 items-center">
           {noLogo ? (
             <span className="h-6" />
           ) : (
             (logo ?? <PipecatLogo height={20} />)
           )}
         </div>
-        <strong className="hidden truncate text-sm sm:block">
+        <strong className="hidden min-w-0 truncate text-sm md:block">
           {titleText}
         </strong>
-        <div className="flex items-center justify-end gap-1">
-          {headerSlot}
+        <div className="ml-auto flex min-w-0 items-center justify-end gap-1">
+          {/* Slot content may shrink; the console's own controls never do. */}
+          {headerSlot && (
+            <div className="flex min-w-0 items-center gap-1">{headerSlot}</div>
+          )}
           {!noDTMF && <ConsoleKeypadToggle mode={keypadMode} />}
           {!noInfoPanel && (
             <Button
               variant="ghost"
               size="icon-sm"
-              className="hidden sm:inline-flex"
+              className="hidden lg:inline-flex"
               aria-label={
                 isInfoCollapsed ? "Expand info panel" : "Collapse info panel"
               }
@@ -681,13 +685,13 @@ function ConsoleShell({
         ) : (
           <Tabs
             defaultValue={
-              noBotArea
-                ? noConversationPanel
-                  ? noInfoPanel
-                    ? "events"
-                    : "info"
-                  : "conversation"
-                : "bot"
+              !noConversationPanel
+                ? "conversation"
+                : !noBotArea
+                  ? "bot"
+                  : !noInfoPanel
+                    ? "info"
+                    : "events"
             }
             className="flex h-full min-h-0 flex-col"
           >
@@ -716,14 +720,14 @@ function ConsoleShell({
               </TabsContent>
             )}
             <TabsList className="mt-2 w-full">
-              {!noBotArea && (
-                <TabsTrigger value="bot" aria-label="Bot media">
-                  <BotIcon />
-                </TabsTrigger>
-              )}
               {!noConversationPanel && (
                 <TabsTrigger value="conversation" aria-label="Conversation">
                   <MessagesSquareIcon />
+                </TabsTrigger>
+              )}
+              {!noBotArea && (
+                <TabsTrigger value="bot" aria-label="Bot media">
+                  <BotIcon />
                 </TabsTrigger>
               )}
               {!noInfoPanel && (
