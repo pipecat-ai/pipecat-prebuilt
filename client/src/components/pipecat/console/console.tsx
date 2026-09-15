@@ -591,6 +591,7 @@ function ConsoleShell({
             orientation="vertical"
             defaultLayout={verticalLayout.defaultLayout}
             onLayoutChanged={verticalLayout.onLayoutChanged}
+            className="gap-2"
           >
             <ResizablePanel id="main" defaultSize="70%" minSize="50%">
               <ResizablePanelGroup
