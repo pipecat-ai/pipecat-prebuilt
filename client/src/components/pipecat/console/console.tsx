@@ -68,6 +68,8 @@ import {
   usePipecatApp,
   type UsePipecatAppReturn,
 } from "@/hooks/use-pipecat-app";
+import { usePipecatEventStream } from "@/hooks/use-pipecat-event-stream";
+import { usePipecatMetricValue } from "@/hooks/use-pipecat-metrics";
 import type {
   TransportFactory,
   TransportOptions,
@@ -110,6 +112,18 @@ function getConnectionUrl(
     extractUrlFromOptions(connectParams) ||
     extractUrlFromOptions(transportOptions);
   return candidate ? resolveUrl(candidate) : undefined;
+}
+
+// The metrics tab and the mobile events tab unmount while inactive. These keep
+// their shared stores collecting, so opening either shows the whole session.
+function MetricsCollector() {
+  usePipecatMetricValue("ttfb");
+  return null;
+}
+
+function EventStreamCollector() {
+  usePipecatEventStream();
+  return null;
 }
 
 /** Inert storage handed to useDefaultLayout when persistence is off. */
@@ -283,6 +297,8 @@ export function Console(props: ConsoleProps) {
         <ConsoleShell {...props} app={app} />
       </TooltipProvider>
       {!props.noAudioOutput && <BotAudioOutput />}
+      {!props.noMetrics && <MetricsCollector />}
+      {!props.noEvents && <EventStreamCollector />}
       {transportType === "smallwebrtc" && (
         <SmallWebRTCCodecSetter
           audioCodec={props.audioCodec}
