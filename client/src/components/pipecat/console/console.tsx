@@ -184,7 +184,7 @@ export interface ConsoleProps {
   noBotAudio?: boolean;
   /** Hides the volume control in the bot audio pane header. */
   noBotAudioControls?: boolean;
-  /** Hides the bot video pane. Default TRUE — most voice bots have no video. */
+  /** Hides the bot video pane. Default false. */
   noBotVideo?: boolean;
   noConversation?: boolean;
   noMetrics?: boolean;
@@ -326,7 +326,7 @@ function ConsoleShell({
   noAudioOutput = false,
   noBotAudio = false,
   noBotAudioControls = false,
-  noBotVideo = true,
+  noBotVideo = false,
   noConversation = false,
   noMetrics = false,
   noEvents = false,
