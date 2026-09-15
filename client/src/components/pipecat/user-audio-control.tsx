@@ -444,7 +444,7 @@ export function UserAudioControlView({
                   ? unavailableText
                   : "Microphone unavailable"
           }
-          className={cn(!iconOnly && "min-w-32")}
+          className={cn("grow", !iconOnly && "min-w-32")}
         >
           {isLoading ? (
             <>
@@ -495,6 +495,8 @@ export function UserAudioControlView({
         }
         aria-keyshortcuts={isPtt && pttKey ? keyLabel(pttKey) : undefined}
         className={cn(
+          // Fills a group given a width; content-sized groups are unaffected.
+          "grow",
           !isMicEnabled && inactiveClasses(variant),
           !iconOnly && "min-w-32",
           isPtt && "touch-none",

@@ -160,7 +160,7 @@ export function UserVideoControlView({
                   ? unavailableText
                   : "Camera unavailable"
           }
-          className={cn(!iconOnly && "min-w-32")}
+          className={cn("grow", !iconOnly && "min-w-32")}
         >
           {isLoading ? (
             <>
@@ -209,6 +209,8 @@ export function UserVideoControlView({
           }
           onClick={onToggleCam}
           className={cn(
+            // Fills a group given a width; content-sized groups are unaffected.
+            "grow",
             !isCamEnabled && inactiveClasses(variant),
             !iconOnly && "min-w-32",
           )}

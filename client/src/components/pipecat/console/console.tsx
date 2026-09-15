@@ -614,7 +614,10 @@ function ConsoleShell({
                       )
                     }
                   >
-                    {mediaStack(isMediaCollapsed)}
+                    {/* p-px keeps each card's ring inside the panel's scroll box, which clips it. */}
+                    <div className="h-full p-px">
+                      {mediaStack(isMediaCollapsed)}
+                    </div>
                   </ResizablePanel>
                 )}
                 {!noBotArea && (!noConversationPanel || !noInfoPanel) && (
@@ -626,7 +629,7 @@ function ConsoleShell({
                     defaultSize={`${conversationDefaultSize}%`}
                     minSize="30%"
                   >
-                    {conversationPanel}
+                    <div className="h-full p-px">{conversationPanel}</div>
                   </ResizablePanel>
                 )}
                 {!noConversationPanel && !noInfoPanel && (
@@ -646,7 +649,9 @@ function ConsoleShell({
                       )
                     }
                   >
-                    {infoPanel(isInfoCollapsed)}
+                    <div className="h-full p-px">
+                      {infoPanel(isInfoCollapsed)}
+                    </div>
                   </ResizablePanel>
                 )}
               </ResizablePanelGroup>
@@ -666,7 +671,9 @@ function ConsoleShell({
                   )
                 }
               >
-                {eventsPanel(isEventsCollapsed)}
+                <div className="h-full p-px">
+                  {eventsPanel(isEventsCollapsed)}
+                </div>
               </ResizablePanel>
             )}
           </ResizablePanelGroup>
