@@ -17,6 +17,22 @@ Users should install:
 pip install pipecat-ai-prebuilt
 ```
 
+## [Unreleased]
+
+### Changed
+
+- The prebuilt client is now built with [Pipecat UI](https://ui.pipecat.ai)
+  instead of `@pipecat-ai/voice-ui-kit`. The console comes from the
+  `@pipecat/console` registry block, installed into `client/src` with the
+  shadcn CLI.
+- The theme follows the system preference on load. The header toggle still
+  switches it, but the choice is no longer remembered between visits.
+- CI builds the client with Node 22, as required by Vite 8 and Tailwind CSS 4.
+
+### Removed
+
+- Custom CSS that targeted the voice-ui-kit console header.
+
 ## [1.1.0] - 2026-09-09
 
 ### Added
