@@ -1,6 +1,6 @@
 {
   "name": "client",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "main": "index.js",
   "scripts": {
     "dev": "node_modules/.bin/vite",
@@ -31,11 +31,11 @@
     "@fontsource-variable/geist": "^5.3.0",
     "@pipecat-ai/client-js": "^1.13.1",
     "@pipecat-ai/client-react": "^1.8.2",
-    "@pipecat-ai/daily-transport": "^1.6.8",
+    "@pipecat-ai/daily-transport": "^1.6.9",
     "@pipecat-ai/livekit-transport": "^1.0.0",
     "@pipecat-ai/moq-transport": "^0.1.1",
-    "@pipecat-ai/small-webrtc-transport": "^1.10.6",
-    "@pipecat-ai/websocket-transport": "^1.7.1",
+    "@pipecat-ai/small-webrtc-transport": "^1.10.8",
+    "@pipecat-ai/websocket-transport": "^1.7.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cn": "^0.3.0",

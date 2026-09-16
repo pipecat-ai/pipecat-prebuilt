@@ -33,6 +33,16 @@ pip install pipecat-ai-prebuilt
 
 - Custom CSS that targeted the voice-ui-kit console header.
 
+## [1.1.1] - 2026-09-15
+
+### Changed
+
+- Updated client dependencies to:
+  - `@pipecat-ai/client-js` to `1.13.1`
+  - `@pipecat-ai/daily-transport` to `1.6.9`
+  - `@pipecat-ai/small-webrtc-transport` to `1.10.8`
+  - `@pipecat-ai/websocket-transport` to `1.7.2`
+
 ## [1.1.0] - 2026-09-09
 
 ### Added
