@@ -1,9 +1,12 @@
 {
   "compilerOptions": {
-    "target": "ES2016",
+    "target": "ES2022",
     "module": "ESNext",
-    "lib": ["ES2016", "DOM", "DOM.Iterable"],
-    "types": ["node"],
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "types": ["node", "vite/client"],
+    "paths": {
+      "@/*": ["./src/*"]
+    },
     "skipLibCheck": true,
     "jsx": "preserve",
 
