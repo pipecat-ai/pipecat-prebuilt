@@ -25,7 +25,10 @@ export interface PipecatEventGroup {
 }
 
 /** High-frequency events never captured into the shared log. */
-const CAPTURE_IGNORED: string[] = [RTVIEvent.LocalAudioLevel];
+const CAPTURE_IGNORED: string[] = [
+  RTVIEvent.LocalAudioLevel,
+  RTVIEvent.RemoteAudioLevel,
+];
 
 interface PipecatEventStreamState {
   /** The shared capture log, oldest first, capped at maxEvents. */
@@ -166,7 +169,7 @@ export interface UsePipecatEventStreamOptions {
   maxEvents?: number;
   /** Only these event types pass this subscriber's filter (wins over ignoreEvents). */
   includeEvents?: string[];
-  /** Event types hidden from this subscriber (LocalAudioLevel is never captured). */
+  /** Event types hidden from this subscriber (audio level events are never captured). */
   ignoreEvents?: string[];
   /** Also derive `groups`, merging consecutive events with the same key. */
   groupConsecutive?: boolean;
