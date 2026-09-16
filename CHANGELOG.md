@@ -21,7 +21,7 @@ pip install pipecat-ai-prebuilt
 
 ### Changed
 
-- Updated the Pipecat UI components to 1.1.1. The console events panel now
+- Updated the Pipecat UI components to 1.1.2. The console events panel now
   hides metrics and bot LLM/TTS events, and shows each `botOutput` segment
   once per spoken status.
 
