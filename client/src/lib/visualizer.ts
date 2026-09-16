@@ -1,3 +1,4 @@
+/** Track-derived silent/speaking states; connecting/thinking are explicit overrides. */
 export type VisualizerState = "connecting" | "silent" | "speaking" | "thinking";
 
 /** One mel-spaced analyser band: its FFT bin range plus tilt boost. */
