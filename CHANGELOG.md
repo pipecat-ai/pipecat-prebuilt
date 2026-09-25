@@ -17,6 +17,14 @@ Users should install:
 pip install pipecat-ai-prebuilt
 ```
 
+## [1.2.2] - 2026-09-24
+
+### Fixed
+
+- Updated the Pipecat UI components to 1.1.3. The conversation panel now keeps
+  autoscrolling while long bot replies stream in, instead of losing its place
+  partway through.
+
 ## [1.2.1] - 2026-09-16
 
 ### Changed
