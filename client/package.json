@@ -9,7 +9,7 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "BSD-2-Clause",
   "description": "",
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.3",
