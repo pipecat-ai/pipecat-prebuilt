@@ -9,8 +9,14 @@ const FALLBACK_DIR = path.join(import.meta.dirname, "licenses");
  * package bundled into the client with its license. A package that ships no
  * license file gets the standard text from licenses/<SPDX id>.txt, with its
  * copyright line pointing to the package source.
+ *
+ * `packages` names npm packages the bundle uses without importing them as
+ * modules (for example, a stylesheet pulled in through a CSS @import).
+ * `vendored` lists third-party code copied into this repository, each with
+ * `name`, `license`, `source` and `file` (its license text, relative to this
+ * directory).
  */
-export default function thirdPartyNotices() {
+export default function thirdPartyNotices({ packages = [], vendored = [] } = {}) {
   let root = process.cwd();
   return {
     name: "third-party-notices",
@@ -31,14 +37,23 @@ export default function thirdPartyNotices() {
         }
       }
 
-      const packages = [...roots]
-        .map(describe)
-        .filter(Boolean)
-        .sort((a, b) => a.name.localeCompare(b.name));
+      for (const name of packages) {
+        roots.add(path.join(root, "node_modules", name));
+      }
 
-      const sections = packages.map((pkg) =>
+      const entries = [
+        ...[...roots].map(describe).filter(Boolean),
+        ...vendored.map((item) => ({
+          name: item.name,
+          license: item.license,
+          source: item.source,
+          text: fs.readFileSync(path.join(import.meta.dirname, item.file), "utf8").trim(),
+        })),
+      ].sort((a, b) => a.name.localeCompare(b.name));
+
+      const sections = entries.map((pkg) =>
         [
-          `${pkg.name}@${pkg.version}`,
+          pkg.version ? `${pkg.name}@${pkg.version}` : pkg.name,
           `License: ${pkg.license}`,
           ...(pkg.source ? [`Source: ${pkg.source}`] : []),
           "",
