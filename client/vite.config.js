@@ -6,7 +6,21 @@ import thirdPartyNotices from "./third-party-notices.js";
 
 export default defineConfig({
   base: "./", //Use relative paths so it works at any mount path
-  plugins: [react(), tailwindcss(), thirdPartyNotices()],
+  plugins: [
+    react(),
+    tailwindcss(),
+    thirdPartyNotices({
+      packages: ["shadcn"],
+      vendored: [
+        {
+          name: "shadcn/ui components (src/components/ui)",
+          license: "MIT",
+          source: "https://github.com/shadcn-ui/ui",
+          file: "licenses/vendored/shadcn-ui.txt",
+        },
+      ],
+    }),
+  ],
   publicDir: "public",
   resolve: {
     alias: {
