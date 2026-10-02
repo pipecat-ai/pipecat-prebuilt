@@ -242,7 +242,6 @@ function Home() {
         key={transportType}
         {...getTransportProps(transportType)}
         titleText="Pipecat Playground"
-        noUserVideo
         headerSlot={
           <>
             <TransportSelect

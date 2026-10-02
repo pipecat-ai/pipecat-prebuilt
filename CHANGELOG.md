@@ -17,6 +17,14 @@ Users should install:
 pip install pipecat-ai-prebuilt
 ```
 
+## [1.3.0] - 2026-10-02
+
+### Added
+
+- The console shows a camera toggle in the Devices section, alongside the mic
+  and screen-share controls. The camera starts off; users turn it on from the
+  toggle.
+
 ## [1.2.2] - 2026-09-24
 
 ### Fixed
