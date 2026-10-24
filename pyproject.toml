@@ -25,7 +25,7 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "setuptools~=83.0.0",
+    "setuptools~=84.1",
     "build~=1.4.0",
 ]
 
