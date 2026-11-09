@@ -28,6 +28,7 @@ from pipecat.services.openai.llm import OpenAILLMService
 from pipecat.transports.base_transport import BaseTransport, TransportParams
 from pipecat.transports.daily.transport import DailyParams
 from pipecat.transports.livekit.transport import LiveKitParams
+from pipecat.transports.moq.transport import MOQParams
 from pipecat.transports.websocket.fastapi import FastAPIWebsocketParams
 from pipecat.workers.runner import WorkerRunner
 from pipecat_ai_prebuilt.frontend import PipecatPrebuiltUI
@@ -58,6 +59,10 @@ transport_params = {
         audio_out_enabled=True,
     ),
     "livekit": lambda: LiveKitParams(
+        audio_in_enabled=True,
+        audio_out_enabled=True,
+    ),
+    "moq": lambda: MOQParams(
         audio_in_enabled=True,
         audio_out_enabled=True,
     ),

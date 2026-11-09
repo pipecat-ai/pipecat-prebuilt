@@ -17,6 +17,25 @@ Users should install:
 pip install pipecat-ai-prebuilt
 ```
 
+## [1.4.0] - 2026-11-09
+
+### Added
+
+- The test bot now accepts `moq` as a transport, using `MOQParams`.
+
+### Changed
+
+- Updated client dependencies to:
+  - `@pipecat-ai/client-js` to `1.16.0`
+  - `@pipecat-ai/client-react` to `1.11.0`
+  - `@pipecat-ai/daily-transport` to `1.7.2`
+  - `@pipecat-ai/livekit-transport` to `1.1.2`
+  - `@pipecat-ai/moq-transport` to `0.3.3`
+  - `@pipecat-ai/small-webrtc-transport` to `1.11.2`
+  - `@pipecat-ai/websocket-transport` to `1.8.2`
+- Updated dependencies to resolve Dependabot alerts, including `certifi`
+  2026.10.19 to drop the distrusted emSign root CA.
+
 ## [1.3.0] - 2026-10-02
 
 ### Added
