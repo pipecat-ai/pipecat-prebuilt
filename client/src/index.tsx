@@ -38,6 +38,23 @@ const TRANSPORT_OPTIONS: { value: TransportType; label: string }[] = [
   { value: "moq", label: "Media over QUIC" },
 ];
 
+// Map runner -t names to client transport values.
+const TRANSPORT_ALIASES: Record<string, TransportType> = {
+  webrtc: "smallwebrtc",
+};
+
+// Initial dropdown value from ?transport= query param; falls back to smallwebrtc.
+function getInitialTransportType(): TransportType {
+  const param = new URLSearchParams(window.location.search)
+    .get("transport")
+    ?.toLowerCase();
+  if (!param) return "smallwebrtc";
+  const resolved = TRANSPORT_ALIASES[param] ?? param;
+  return TRANSPORT_OPTIONS.some(({ value }) => value === resolved)
+    ? (resolved as TransportType)
+    : "smallwebrtc";
+}
+
 type TransportProps = Pick<
   ConsoleProps,
   | "transportType"
@@ -212,8 +229,9 @@ function TransportSelect({ value, onValueChange }: TransportSelectProps) {
 }
 
 function Home() {
-  const [transportType, setTransportType] =
-    useState<TransportType>("smallwebrtc");
+  const [transportType, setTransportType] = useState<TransportType>(
+    getInitialTransportType,
+  );
   // Lives outside the keyed Console so switching transports keeps the theme.
   const [dark, setDark] = useState(
     () => window.matchMedia("(prefers-color-scheme: dark)").matches,
