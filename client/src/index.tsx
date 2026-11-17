@@ -38,6 +38,33 @@ const TRANSPORT_OPTIONS: { value: TransportType; label: string }[] = [
   { value: "moq", label: "Media over QUIC" },
 ];
 
+// Runner transport name (GET /status, POST /start) for each dropdown option.
+const RUNNER_TRANSPORT_NAMES: Record<TransportType, string> = {
+  smallwebrtc: "webrtc",
+  daily: "daily",
+  websocket: "websocket",
+  twilio: "twilio",
+  livekit: "livekit",
+  moq: "moq",
+};
+
+// Dropdown options limited to transports the runner reports in GET /status.
+// All options when the request fails or none of them match.
+async function fetchTransportOptions(): Promise<typeof TRANSPORT_OPTIONS> {
+  try {
+    const response = await fetch("/status");
+    if (!response.ok) return TRANSPORT_OPTIONS;
+    const { transports } = (await response.json()) as { transports?: unknown };
+    if (!Array.isArray(transports)) return TRANSPORT_OPTIONS;
+    const supported = TRANSPORT_OPTIONS.filter(({ value }) =>
+      transports.includes(RUNNER_TRANSPORT_NAMES[value]),
+    );
+    return supported.length ? supported : TRANSPORT_OPTIONS;
+  } catch {
+    return TRANSPORT_OPTIONS;
+  }
+}
+
 type TransportProps = Pick<
   ConsoleProps,
   | "transportType"
@@ -186,14 +213,19 @@ const emulateTwilioMessages = (websocketTransport: WebSocketTransport) => {
 };
 
 type TransportSelectProps = {
+  options: typeof TRANSPORT_OPTIONS;
   value: TransportType;
   onValueChange: (value: TransportType) => void;
 };
 
-function TransportSelect({ value, onValueChange }: TransportSelectProps) {
+function TransportSelect({
+  options,
+  value,
+  onValueChange,
+}: TransportSelectProps) {
   return (
     <Select
-      items={TRANSPORT_OPTIONS}
+      items={options}
       value={value}
       onValueChange={(next) => onValueChange(next as TransportType)}
     >
@@ -201,7 +233,7 @@ function TransportSelect({ value, onValueChange }: TransportSelectProps) {
         <SelectValue />
       </SelectTrigger>
       <SelectContent>
-        {TRANSPORT_OPTIONS.map(({ value, label }) => (
+        {options.map(({ value, label }) => (
           <SelectItem key={value} value={value}>
             {label}
           </SelectItem>
@@ -212,12 +244,33 @@ function TransportSelect({ value, onValueChange }: TransportSelectProps) {
 }
 
 function Home() {
+  // null until GET /status resolves; the Console mounts after, so Connect
+  // is never enabled with a transport the runner would reject.
+  const [transportOptions, setTransportOptions] = useState<
+    typeof TRANSPORT_OPTIONS | null
+  >(null);
   const [transportType, setTransportType] =
     useState<TransportType>("smallwebrtc");
   // Lives outside the keyed Console so switching transports keeps the theme.
   const [dark, setDark] = useState(
     () => window.matchMedia("(prefers-color-scheme: dark)").matches,
   );
+
+  useEffect(() => {
+    let cancelled = false;
+    void fetchTransportOptions().then((options) => {
+      if (cancelled) return;
+      setTransportOptions(options);
+      setTransportType((current) =>
+        options.some(({ value }) => value === current)
+          ? current
+          : options[0].value,
+      );
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", dark);
@@ -235,6 +288,8 @@ function Home() {
     });
   };
 
+  if (!transportOptions) return null;
+
   return (
     <div className="h-dvh">
       <Console
@@ -245,6 +300,7 @@ function Home() {
         headerSlot={
           <>
             <TransportSelect
+              options={transportOptions}
               value={transportType}
               onValueChange={setTransportType}
             />
