@@ -9,6 +9,7 @@ import {
   Console,
   type ConsoleProps,
 } from "@/components/pipecat/console/console";
+import { PipecatLogo } from "@/components/pipecat/console/logo";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -49,10 +50,12 @@ const RUNNER_TRANSPORT_NAMES: Record<TransportType, string> = {
 };
 
 // Dropdown options limited to transports the runner reports in GET /status.
-// All options when the request fails or none of them match.
+// All options when the request fails, times out, or none of them match.
 async function fetchTransportOptions(): Promise<typeof TRANSPORT_OPTIONS> {
   try {
-    const response = await fetch("/status");
+    const response = await fetch("/status", {
+      signal: AbortSignal.timeout(3000),
+    });
     if (!response.ok) return TRANSPORT_OPTIONS;
     const { transports } = (await response.json()) as { transports?: unknown };
     if (!Array.isArray(transports)) return TRANSPORT_OPTIONS;
@@ -216,18 +219,21 @@ type TransportSelectProps = {
   options: typeof TRANSPORT_OPTIONS;
   value: TransportType;
   onValueChange: (value: TransportType) => void;
+  disabled?: boolean;
 };
 
 function TransportSelect({
   options,
   value,
   onValueChange,
+  disabled,
 }: TransportSelectProps) {
   return (
     <Select
       items={options}
       value={value}
       onValueChange={(next) => onValueChange(next as TransportType)}
+      disabled={disabled}
     >
       <SelectTrigger aria-label="Transport" size="sm" className="w-40 min-w-24">
         <SelectValue />
@@ -244,8 +250,7 @@ function TransportSelect({
 }
 
 function Home() {
-  // null until GET /status resolves; the Console mounts after, so Connect
-  // is never enabled with a transport the runner would reject.
+  // null until GET /status resolves.
   const [transportOptions, setTransportOptions] = useState<
     typeof TRANSPORT_OPTIONS | null
   >(null);
@@ -288,7 +293,47 @@ function Home() {
     });
   };
 
-  if (!transportOptions) return null;
+  const headerControls = (
+    <>
+      <TransportSelect
+        options={transportOptions ?? TRANSPORT_OPTIONS}
+        value={transportType}
+        onValueChange={setTransportType}
+        disabled={!transportOptions}
+      />
+      <Button
+        variant="ghost"
+        size="icon-sm"
+        aria-label={dark ? "Use light theme" : "Use dark theme"}
+        onClick={() => setDark(!dark)}
+      >
+        {dark ? <SunIcon /> : <MoonIcon />}
+      </Button>
+    </>
+  );
+
+  // While GET /status is pending, show the header with a disabled transport
+  // selector; the Console mounts after, so Connect is never enabled with a
+  // transport the runner would reject.
+  if (!transportOptions) {
+    return (
+      <div className="h-dvh">
+        <div className="bg-background text-foreground flex h-full min-h-0 flex-col">
+          <header className="flex items-center gap-2 border-b px-3 py-2">
+            <div className="flex shrink-0 items-center">
+              <PipecatLogo height={20} />
+            </div>
+            <strong className="hidden min-w-0 truncate text-sm md:block">
+              Pipecat Playground
+            </strong>
+            <div className="ml-auto flex min-w-0 items-center justify-end gap-1">
+              {headerControls}
+            </div>
+          </header>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-dvh">
@@ -297,23 +342,7 @@ function Home() {
         key={transportType}
         {...getTransportProps(transportType)}
         titleText="Pipecat Playground"
-        headerSlot={
-          <>
-            <TransportSelect
-              options={transportOptions}
-              value={transportType}
-              onValueChange={setTransportType}
-            />
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              aria-label={dark ? "Use light theme" : "Use dark theme"}
-              onClick={() => setDark(!dark)}
-            >
-              {dark ? <SunIcon /> : <MoonIcon />}
-            </Button>
-          </>
-        }
+        headerSlot={headerControls}
         onClient={onClient}
       />
     </div>
