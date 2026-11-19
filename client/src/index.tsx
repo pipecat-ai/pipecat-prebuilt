@@ -9,6 +9,7 @@ import {
   Console,
   type ConsoleProps,
 } from "@/components/pipecat/console/console";
+import { PipecatLogo } from "@/components/pipecat/console/logo";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -37,6 +38,35 @@ const TRANSPORT_OPTIONS: { value: TransportType; label: string }[] = [
   { value: "livekit", label: "LiveKit" },
   { value: "moq", label: "Media over QUIC" },
 ];
+
+// Runner transport name (GET /status, POST /start) for each dropdown option.
+const RUNNER_TRANSPORT_NAMES: Record<TransportType, string> = {
+  smallwebrtc: "webrtc",
+  daily: "daily",
+  websocket: "websocket",
+  twilio: "twilio",
+  livekit: "livekit",
+  moq: "moq",
+};
+
+// Dropdown options limited to transports the runner reports in GET /status.
+// All options when the request fails, times out, or none of them match.
+async function fetchTransportOptions(): Promise<typeof TRANSPORT_OPTIONS> {
+  try {
+    const response = await fetch("/status", {
+      signal: AbortSignal.timeout(3000),
+    });
+    if (!response.ok) return TRANSPORT_OPTIONS;
+    const { transports } = (await response.json()) as { transports?: unknown };
+    if (!Array.isArray(transports)) return TRANSPORT_OPTIONS;
+    const supported = TRANSPORT_OPTIONS.filter(({ value }) =>
+      transports.includes(RUNNER_TRANSPORT_NAMES[value]),
+    );
+    return supported.length ? supported : TRANSPORT_OPTIONS;
+  } catch {
+    return TRANSPORT_OPTIONS;
+  }
+}
 
 type TransportProps = Pick<
   ConsoleProps,
@@ -186,22 +216,30 @@ const emulateTwilioMessages = (websocketTransport: WebSocketTransport) => {
 };
 
 type TransportSelectProps = {
+  options: typeof TRANSPORT_OPTIONS;
   value: TransportType;
   onValueChange: (value: TransportType) => void;
+  disabled?: boolean;
 };
 
-function TransportSelect({ value, onValueChange }: TransportSelectProps) {
+function TransportSelect({
+  options,
+  value,
+  onValueChange,
+  disabled,
+}: TransportSelectProps) {
   return (
     <Select
-      items={TRANSPORT_OPTIONS}
+      items={options}
       value={value}
       onValueChange={(next) => onValueChange(next as TransportType)}
+      disabled={disabled}
     >
       <SelectTrigger aria-label="Transport" size="sm" className="w-40 min-w-24">
         <SelectValue />
       </SelectTrigger>
       <SelectContent>
-        {TRANSPORT_OPTIONS.map(({ value, label }) => (
+        {options.map(({ value, label }) => (
           <SelectItem key={value} value={value}>
             {label}
           </SelectItem>
@@ -212,12 +250,32 @@ function TransportSelect({ value, onValueChange }: TransportSelectProps) {
 }
 
 function Home() {
+  // null until GET /status resolves.
+  const [transportOptions, setTransportOptions] = useState<
+    typeof TRANSPORT_OPTIONS | null
+  >(null);
   const [transportType, setTransportType] =
     useState<TransportType>("smallwebrtc");
   // Lives outside the keyed Console so switching transports keeps the theme.
   const [dark, setDark] = useState(
     () => window.matchMedia("(prefers-color-scheme: dark)").matches,
   );
+
+  useEffect(() => {
+    let cancelled = false;
+    void fetchTransportOptions().then((options) => {
+      if (cancelled) return;
+      setTransportOptions(options);
+      setTransportType((current) =>
+        options.some(({ value }) => value === current)
+          ? current
+          : options[0].value,
+      );
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", dark);
@@ -235,6 +293,48 @@ function Home() {
     });
   };
 
+  const headerControls = (
+    <>
+      <TransportSelect
+        options={transportOptions ?? TRANSPORT_OPTIONS}
+        value={transportType}
+        onValueChange={setTransportType}
+        disabled={!transportOptions}
+      />
+      <Button
+        variant="ghost"
+        size="icon-sm"
+        aria-label={dark ? "Use light theme" : "Use dark theme"}
+        onClick={() => setDark(!dark)}
+      >
+        {dark ? <SunIcon /> : <MoonIcon />}
+      </Button>
+    </>
+  );
+
+  // While GET /status is pending, show the header with a disabled transport
+  // selector; the Console mounts after, so Connect is never enabled with a
+  // transport the runner would reject.
+  if (!transportOptions) {
+    return (
+      <div className="h-dvh">
+        <div className="bg-background text-foreground flex h-full min-h-0 flex-col">
+          <header className="flex items-center gap-2 border-b px-3 py-2">
+            <div className="flex shrink-0 items-center">
+              <PipecatLogo height={20} />
+            </div>
+            <strong className="hidden min-w-0 truncate text-sm md:block">
+              Pipecat Playground
+            </strong>
+            <div className="ml-auto flex min-w-0 items-center justify-end gap-1">
+              {headerControls}
+            </div>
+          </header>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="h-dvh">
       <Console
@@ -242,22 +342,7 @@ function Home() {
         key={transportType}
         {...getTransportProps(transportType)}
         titleText="Pipecat Playground"
-        headerSlot={
-          <>
-            <TransportSelect
-              value={transportType}
-              onValueChange={setTransportType}
-            />
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              aria-label={dark ? "Use light theme" : "Use dark theme"}
-              onClick={() => setDark(!dark)}
-            >
-              {dark ? <SunIcon /> : <MoonIcon />}
-            </Button>
-          </>
-        }
+        headerSlot={headerControls}
         onClient={onClient}
       />
     </div>
