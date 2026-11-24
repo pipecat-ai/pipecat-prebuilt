@@ -40,6 +40,10 @@ export default defineConfig({
         target: "http://0.0.0.0:7860", // Replace with your backend URL
         changeOrigin: true,
       },
+      "/status": {
+        target: "http://0.0.0.0:7860", // Replace with your backend URL
+        changeOrigin: true,
+      },
       "/sessions": {
         target: "http://0.0.0.0:7860", // Replace with your backend URL
         changeOrigin: true,
