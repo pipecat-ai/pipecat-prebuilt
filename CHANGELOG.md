@@ -17,6 +17,18 @@ Users should install:
 pip install pipecat-ai-prebuilt
 ```
 
+## [1.5.0] - 2026-11-24
+
+### Changed
+
+- The transport dropdown now lists only the transports the server supports.
+  On load, the client calls `GET /status` and keeps the options the runner
+  reports. If the request fails, times out after 3 seconds, or matches no
+  transports, the dropdown shows every option as before. The transport
+  selector is disabled until the request finishes. If the default transport
+  isn't supported, the client selects the first supported one.
+- Updated `@pipecat-ai/moq-transport` to `0.3.4`.
+
 ## [1.4.0] - 2026-11-09
 
 ### Added
